@@ -9,10 +9,11 @@ use Illuminate\Http\Request;
 
 class ContactController extends Controller
 {
-    // public function importForm()
-    // {
-    //     return view('contacts.import');
-    // }
+    public function index()
+    {
+        $contacts = Contact::all();
+        return view('import_contact', compact('contacts'));
+    }
 
     public function import(Request $request)
     {
@@ -22,10 +23,8 @@ class ContactController extends Controller
 
     $file = $request->file('xml_file');
 
-    // Load file contents
     $xmlContent = file_get_contents($file->getRealPath());
 
-    // Parse XML
     libxml_use_internal_errors(true); // prevent fatal error on invalid XML
     $xml = simplexml_load_string($xmlContent);
     
@@ -47,5 +46,27 @@ class ContactController extends Controller
     }
 
     return redirect()->route('contacts.index')->with('success', "$inserted contacts imported successfully!");
+    }
+
+    public function edit(Contact $contact)
+    {
+        return view('edit', compact('contact'));
+    }
+    public function update(Request $request, Contact $contact)
+    {
+        $request->validate([
+            'name' => 'required',
+            'phone' => 'required'
+        ]);
+
+        $contact->update($request->all());
+
+        return redirect()->route('contacts.index')->with('success', 'Contact updated successfully.');
+    }
+
+    public function destroy(Contact $contact)
+    {
+        $contact->delete();
+        return redirect()->route('contacts.index')->with('success', 'Contact deleted successfully.');
     }
 }
