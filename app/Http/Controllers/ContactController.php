@@ -35,11 +35,10 @@ class ContactController extends Controller
     $inserted = 0;
 
     foreach ($xml->contact as $entry) {
-        if (isset($entry->name) && isset($entry->phone)) {
+        if (isset($entry->name) && isset($entry->phone) && preg_match('/^\+?[0-9\- ]{10,20}$/', $entry->phone)) {
             Contact::create([
-                'name' => (string) $entry->name,
-                'phone' => (string) $entry->phone,
-                'email' => uniqid('import_') . '@example.com', // fallback or dummy email
+            'name' => (string) $entry->name,
+            'phone' => (string) $entry->phone
             ]);
             $inserted++;
         }
@@ -55,8 +54,11 @@ class ContactController extends Controller
     public function update(Request $request, Contact $contact)
     {
         $request->validate([
-            'name' => 'required',
-            'phone' => 'required'
+            'name' => 'required|string|max:255',
+            'phone' => [
+                'required',
+                'regex:/^\+?[0-9\- ]{10,20}$/'
+            ]
         ]);
 
         $contact->update($request->all());

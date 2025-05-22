@@ -86,7 +86,8 @@
                               </div>
                               <div class="mb-3">
                                   <label>Phone</label>
-                                  <input type="text" name="phone" class="form-control" value="{{ $contact->phone }}" required>
+                                  <input type="text" name="phone" class="form-control" value="{{ $contact->phone }}" required oninvalid="this.setCustomValidity('Please enter the number')"
+       oninput="this.setCustomValidity('')" pattern="^\+?[0-9\- ]{10,20}$">
                               </div>
                             </div>
                             <div class="modal-footer">
